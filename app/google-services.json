@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "24824810729",
+    "firebase_url": "https://hpmotochat.firebaseio.com",
+    "project_id": "hpmotochat",
+    "storage_bucket": "hpmotochat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24824810729:android:38736c00ffb8dbfc",
+        "android_client_info": {
+          "package_name": "com.hpmtutorial.hpmotochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "24824810729-qun7mkvi00o10qpl0ukunnphok38ef4s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hpmtutorial.hpmotochat",
+            "certificate_hash": "19023e8bef3692e035312ee91fc71da30159052e"
+          }
+        },
+        {
+          "client_id": "24824810729-0om9qdj7lt4upldtjieskebavkfp46ga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYYkuwOnjlyRTlAYQpC_k6V87CgAxa6Ao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "24824810729-0om9qdj7lt4upldtjieskebavkfp46ga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
