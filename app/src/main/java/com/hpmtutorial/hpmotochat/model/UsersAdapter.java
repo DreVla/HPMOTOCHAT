@@ -12,33 +12,30 @@ import com.hpmtutorial.hpmotochat.R;
 
 import java.util.List;
 
-public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
-    private List<String> mData;
+    private List<User> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    // data is passed into the constructor
-    public MyRecyclerViewAdapter(Context context, List<String> data) {
+    public UsersAdapter(Context context, List<User> data, ItemClickListener listener) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.mClickListener = listener;
     }
 
-    // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.item_user_listing, parent, false);
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String email = mData.get(position);
+        String email = mData.get(position).getEmail();
         holder.myTextView.setText(email);
     }
 
-    // total number of rows
     @Override
     public int getItemCount() {
         if(mData==null) {
@@ -46,14 +43,17 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         } else return mData.size();
     }
 
+    public User getItem(int position) {
+        return mData.get(position);
+    }
 
-    // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView myTextView;
 
         ViewHolder(View itemView) {
             super(itemView);
             myTextView = itemView.findViewById(R.id.all_users_username);
+            myTextView.setOnClickListener(this);
             itemView.setOnClickListener(this);
         }
 
@@ -63,17 +63,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         }
     }
 
-    // convenience method for getting data at click position
-    String getItem(int id) {
-        return mData.get(id);
-    }
 
-    // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }

@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    android:gravity="center_vertical"
     android:focusable="true"
-    android:padding="4dp">
+    android:padding="4dp"
+    android:gravity="end">
+
+    <!--    <TextView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:id="@+id/text_view_user_img"-->
+    <!--        tools:text="username"-->
+    <!--        android:gravity="center"-->
+    <!--        android:maxEms="1"-->
+    <!--        android:textAllCaps="true"-->
+    <!--        android:textColor="@android:color/white"-->
+    <!--        style="bold"-->
+    <!--        android:background="@drawable/circle_accent"-->
+    <!--        android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
+    <!--        android:maxLines="1"/>-->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_view_chat_message"
-        android:background="@drawable/chat_rounded_rect_bg"
-        android:layout_marginStart="64dp"
-        android:layout_toStartOf="@+id/text_view_user_img"
+        tools:text = "Username"
+        android:id="@+id/chat_mine_username"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/chat_mine_message"
+        android:background="@drawable/chat_rounder_rect_me_bg"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@android:color/darker_gray"
-        tools:text="hello!"/>
+        android:textColor="@android:color/holo_red_dark"
+        tools:text="hello!"
+        android:padding="6dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/text_view_user_img"
-        tools:text="username"
-        android:gravity="center"
-        android:maxEms="1"
-        android:textAllCaps="true"
-        android:textColor="@android:color/white"
-        style="bold"
-        android:background="@drawable/circle_accent"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:maxLines="1"/>
-
-</RelativeLayout>
+</LinearLayout>
