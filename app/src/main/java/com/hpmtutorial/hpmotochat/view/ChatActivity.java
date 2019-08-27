@@ -1,39 +1,52 @@
 package com.hpmtutorial.hpmotochat.view;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.hpmtutorial.hpmotochat.R;
 import com.hpmtutorial.hpmotochat.model.Chat;
-import com.hpmtutorial.hpmotochat.model.ChatAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
-
+    private final int PICK_IMAGE_REQUEST = 71;
     public static final String TAG = "ChatView";
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
     private RecyclerView chatRecyclerView;
     private String chatId, senderId, receiverId, senderEmail, receiverEmail;
     private ChatAdapter chatAdapter;
     private List<Chat> chatList = new ArrayList<>();
     private EditText editText;
-
+    private Uri filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +70,12 @@ public class ChatActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         chatRecyclerView = findViewById(R.id.recycler_view_chat);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        chatAdapter = new ChatAdapter(this, chatList);
+        chatAdapter = new ChatAdapter(getApplicationContext(), chatList);
         chatRecyclerView.setAdapter(chatAdapter);
         chatAdapter.setEmailCurrentUser(senderEmail);
         loadChat();
         listenToChanges();
+        if(chatRecyclerView.getAdapter().getItemCount() >1)
         chatRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v,
@@ -78,6 +92,8 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
     }
 
     private void listenToChanges() {
@@ -132,10 +148,12 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    String messageKey;
+    String imgId;
 
     public void sendMessage(View view) {
         final DatabaseReference chatsReff = mDatabase.child("Chats");
-        Chat senderChat = new Chat();
+        final Chat senderChat = new Chat();
         senderChat.setMessage(String.valueOf(editText.getText()));
         senderChat.setReceiverUid(receiverId);
         senderChat.setSenderUid(senderId);
@@ -143,20 +161,69 @@ public class ChatActivity extends AppCompatActivity {
         senderChat.setSender(senderEmail);
         senderChat.setReceiver(receiverEmail);
 
-
-        Chat receiverChat = new Chat();
-        receiverChat.setMessage(String.valueOf(editText.getText()));
-        receiverChat.setSenderUid(receiverId);
-        receiverChat.setReceiverUid(senderId);
-        receiverChat.setTimeStamp(System.currentTimeMillis() / 1000);
-        receiverChat.setReceiver(senderEmail);
-        receiverChat.setSender(receiverEmail);
+        if(filePath==null){
+            messageKey = chatsReff.push().getKey();
+        } else {
+            senderChat.setImage(imgId);
+            filePath=null;
+        }
 
         //push to firebase
-        String messageKey = chatsReff.push().getKey();
+
 
         chatsReff.child(chatId).child(messageKey).setValue(senderChat);
 
         editText.setText("");
+    }
+
+    public void addFile(View view) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null )
+        {
+            final DatabaseReference chatsReff = mDatabase.child("Chats");
+            filePath = data.getData();
+            imgId = chatId + messageKey;
+
+            messageKey = chatsReff.push().getKey();
+
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+            StorageReference ref = storageReference.child("images/"+ imgId);
+            ref.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            Toast.makeText(ChatActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(ChatActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                    .getTotalByteCount());
+                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
+                        }
+                    });
+        }
     }
 }

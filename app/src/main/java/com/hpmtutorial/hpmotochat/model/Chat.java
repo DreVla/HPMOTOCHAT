@@ -1,5 +1,7 @@
 package com.hpmtutorial.hpmotochat.model;
 
+import android.net.Uri;
+
 public class Chat {
 
     public String sender;
@@ -7,17 +9,19 @@ public class Chat {
     public String senderUid;
     public String receiverUid;
     public String message;
+    public String image;
     public long timeStamp;
 
     public Chat() {
     }
 
-    public Chat(String sender, String receiver, String senderUid, String receiverUid, String message, long timeStamp) {
+    public Chat(String sender, String receiver, String senderUid, String receiverUid, String message, long timeStamp, String image) {
         this.sender = sender;
         this.receiver = receiver;
         this.senderUid = senderUid;
         this.receiverUid = receiverUid;
         this.message = message;
+        this.image = image;
         this.timeStamp = timeStamp;
     }
 
@@ -67,5 +71,13 @@ public class Chat {
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

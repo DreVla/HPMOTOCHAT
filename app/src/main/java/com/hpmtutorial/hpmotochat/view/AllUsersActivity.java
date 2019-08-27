@@ -20,7 +20,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hpmtutorial.hpmotochat.R;
-import com.hpmtutorial.hpmotochat.model.UsersAdapter;
 import com.hpmtutorial.hpmotochat.model.User;
 
 import java.util.ArrayList;

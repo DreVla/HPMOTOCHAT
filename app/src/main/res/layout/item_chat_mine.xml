@@ -39,4 +39,10 @@
         tools:text="hello!"
         android:padding="8dp"/>
 
+    <ImageView
+        android:id="@+id/chat_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:src="@drawable/ic_notifications_black_24dp"/>
+
 </LinearLayout>
