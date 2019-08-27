@@ -27,16 +27,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text = "Username"
-        android:id="@+id/chat_mine_username"/>
+        android:id="@+id/chat_username"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/chat_mine_message"
+        android:id="@+id/chat_message"
         android:background="@drawable/chat_rounder_rect_me_bg"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@android:color/holo_red_dark"
         tools:text="hello!"
-        android:padding="6dp" />
+        android:padding="8dp"/>
 
 </LinearLayout>

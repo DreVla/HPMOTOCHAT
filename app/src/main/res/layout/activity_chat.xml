@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:focusableInTouchMode="true"
         android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,6 +15,7 @@
         android:weightSum="1">
 
         <EditText
+            android:inputType="text"
             android:id="@+id/edit_text_message"
             android:layout_width="wrap_content"
             android:layout_height="42dp"
@@ -38,6 +40,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:focusable="true"
         android:layout_above="@id/linear_layout"
         android:id="@+id/recycler_view_chat"
         android:layout_width="match_parent"

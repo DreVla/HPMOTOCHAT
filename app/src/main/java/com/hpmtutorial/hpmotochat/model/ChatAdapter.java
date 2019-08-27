@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.hpmtutorial.hpmotochat.R;
 
 import java.util.List;
@@ -19,8 +18,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Chat> mChats;
     private LayoutInflater mInflater;
     private String emailCurrentUser;
-    private static int TYPE_SENDER = 1, TYPE_RECEIVER=2;
-
     public ChatAdapter(Context context, List<Chat> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mChats = data;
@@ -29,41 +26,28 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
-        if (viewType == TYPE_RECEIVER) {
-            view = mInflater.inflate(R.layout.item_chat_other, parent, false);
-            return new ReceiverViewHolder(view);
-        } else { // for email layout
-            view = mInflater.inflate(R.layout.item_chat_mine, parent, false);
-            return new SenderViewHolder(view);
-        }
+        view = mInflater.inflate(viewType, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        String message = mChats.get(position).getMessage();
-        String username = mChats.get(position).getSender();
-        if (getItemViewType(position) == TYPE_RECEIVER) {
-            ((ReceiverViewHolder) holder).message.setText(message);
-            ((ReceiverViewHolder) holder).usernameTextView.setText(username);
-        } else {
-            ((SenderViewHolder) holder).message.setText(message);
-            ((SenderViewHolder) holder).usernameTextView.setText(username);
-        }
+        Chat chat = mChats.get(position);
+        ((ViewHolder) holder).bind(chat);
     }
-
 
     @Override
     public int getItemViewType(int position) {
         if (emailCurrentUser.equals(mChats.get(position).getSender())) {
-            return TYPE_SENDER;
+            return R.layout.item_chat_mine;
         } else {
-            return TYPE_RECEIVER;
+            return R.layout.item_chat_other;
         }
     }
 
     @Override
     public int getItemCount() {
-        if(mChats==null) {
+        if (mChats == null) {
             return 0;
         } else return mChats.size();
     }
@@ -76,26 +60,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.emailCurrentUser = emailCurrentUser;
     }
 
-    public class ReceiverViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView message;
         TextView usernameTextView;
 
-        ReceiverViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
-            message = itemView.findViewById(R.id.chat_other_message);
-            usernameTextView = itemView.findViewById(R.id.chat_other_username);
+            message = itemView.findViewById(R.id.chat_message);
+            usernameTextView = itemView.findViewById(R.id.chat_username);
+        }
+
+        public void bind(Chat chat){
+            message.setText(chat.getMessage());
+            usernameTextView.setText(chat.getSender());
         }
     }
 
-    public class SenderViewHolder extends RecyclerView.ViewHolder {
-        TextView message;
-        TextView usernameTextView;
-
-        SenderViewHolder(View itemView) {
-            super(itemView);
-            message = itemView.findViewById(R.id.chat_mine_message);
-            usernameTextView = itemView.findViewById(R.id.chat_mine_username);
-        }
-    }
 
 }

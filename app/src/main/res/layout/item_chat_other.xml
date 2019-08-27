@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text = "Username"
-        android:id="@+id/chat_other_username"/>
+        android:id="@+id/chat_username"/>
     <Space
         android:layout_width="16dp"
         android:layout_height="wrap_content" />
@@ -35,12 +35,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/chat_other_message"
+        android:id="@+id/chat_message"
         android:background="@drawable/chat_rounded_rect_bg"
         android:layout_marginEnd="64dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@android:color/white"
         tools:text="hello!"
-        android:padding="6dp" />
+        android:padding="8dp"/>
 
 </LinearLayout>
