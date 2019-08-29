@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/group_message_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_margin="4dp"
+            android:layout_weight="0.99"
+            android:background="@drawable/rounder_rect_bg"
+            android:hint="@string/type"
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="6dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/group_chat_add_file_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="48dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:onClick="addFile"
+            app:icon="@drawable/ic_note_add_black_24dp"
+            app:iconGravity="textStart" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/group_send_button"
+            android:layout_width="64dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:layout_weight="0.01"
+            android:backgroundTint="@color/colorPrimary"
+            android:onClick="sendMessage"
+            app:icon="@drawable/ic_send_black_24dp"
+            app:iconGravity="textStart"/>
+
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/group_recycler_view_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/linear_layout"
+        android:focusable="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+</RelativeLayout>

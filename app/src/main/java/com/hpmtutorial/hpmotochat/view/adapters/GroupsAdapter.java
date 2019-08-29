@@ -1,4 +1,4 @@
-package com.hpmtutorial.hpmotochat.view;
+package com.hpmtutorial.hpmotochat.view.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,17 +9,17 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hpmtutorial.hpmotochat.R;
-import com.hpmtutorial.hpmotochat.model.User;
+import com.hpmtutorial.hpmotochat.model.Group;
 
 import java.util.List;
 
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
+public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
 
-    private List<User> mData;
+    private List<Group> mData;
     private LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
+    private GroupsAdapter.ItemClickListener mClickListener;
 
-    public UsersAdapter(Context context, List<User> data, ItemClickListener listener) {
+    public GroupsAdapter(Context context, List<Group> data, GroupsAdapter.ItemClickListener listener) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.mClickListener = listener;
@@ -27,24 +27,24 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.item_user_listing, parent, false);
+        View view = mInflater.inflate(R.layout.home_lists_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String email = mData.get(position).getEmail();
-        holder.myTextView.setText(email);
+        String title = mData.get(position).getTitle();
+        holder.myTextView.setText(title);
     }
 
     @Override
     public int getItemCount() {
-        if(mData==null) {
+        if (mData == null) {
             return 0;
         } else return mData.size();
     }
 
-    public User getItem(int position) {
+    public Group getItem(int position) {
         return mData.get(position);
     }
 
@@ -53,7 +53,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
         ViewHolder(View itemView) {
             super(itemView);
-            myTextView = itemView.findViewById(R.id.all_users_username);
+            myTextView = itemView.findViewById(R.id.home_list_item_tile);
             myTextView.setOnClickListener(this);
             itemView.setOnClickListener(this);
         }

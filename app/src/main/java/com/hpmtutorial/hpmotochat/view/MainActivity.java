@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(registerIntent,1);
                         break;
                     case SIGNIN:
-                        Intent homeIntent = new Intent(getApplicationContext(), AllUsersActivity.class);
+                        Intent homeIntent = new Intent(getApplicationContext(), HomeActivity.class);
                         startActivity(homeIntent);
                         finish();
                         break;
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
         if (user != null) {
-            Intent homeIntent = new Intent(getApplicationContext(), AllUsersActivity.class);
+            Intent homeIntent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(homeIntent);
             finish();
         }

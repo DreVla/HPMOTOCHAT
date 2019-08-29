@@ -1,4 +1,4 @@
-package com.hpmtutorial.hpmotochat.model;
+package com.hpmtutorial.hpmotochat.utils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

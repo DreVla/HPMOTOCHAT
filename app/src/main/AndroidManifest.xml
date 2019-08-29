@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hpmtutorial.hpmotochat">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,8 +9,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.ChatActivity"></activity>
-        <activity android:name=".view.AllUsersActivity" />
+        <activity android:name=".view.GroupchatActivity"></activity>
+        <activity android:name=".view.CreateGroupActivity" />
+        <activity
+            android:name=".view.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".view.ChatActivity" />
         <activity android:name=".view.EmailPasswordActivity" />
         <activity android:name=".view.MainActivity">
             <intent-filter>
@@ -21,11 +25,16 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".model.FirebaseService">
+        <service android:name=".utils.FirebaseService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
     </application>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

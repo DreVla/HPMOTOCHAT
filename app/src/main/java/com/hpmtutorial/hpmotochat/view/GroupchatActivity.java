@@ -1,5 +1,10 @@
 package com.hpmtutorial.hpmotochat.view;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,11 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,7 +33,8 @@ import com.hpmtutorial.hpmotochat.view.adapters.ChatAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatActivity extends AppCompatActivity {
+public class GroupchatActivity extends AppCompatActivity {
+
     private final int PICK_FILE = 123;
     public static final String TAG = "ChatView";
     private FirebaseAuth mAuth;
@@ -41,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private RecyclerView chatRecyclerView;
-    private String chatId, currentUser, receiverId, senderEmail, receiverEmail;
+    private String groupChatId, currentUser, receiverId, senderEmail, receiverEmail;
     private ChatAdapter chatAdapter;
     private List<Chat> chatList = new ArrayList<>();
     private EditText editText;
@@ -51,47 +52,20 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-
-        editText = findViewById(R.id.edit_text_message);
-        senderEmail = getIntent().getStringExtra("sender");
-        receiverEmail = getIntent().getStringExtra("receiver");
-        currentUser = getIntent().getStringExtra("current_user_uid");
-        receiverId = getIntent().getStringExtra("receiver_user_uid");
-        if (currentUser.compareTo(receiverId) > 0) {
-            chatId = currentUser + receiverId;
-        } else {
-            chatId = receiverId + currentUser;
-        }
-        Log.d(TAG, "onCreate: " + receiverId);
+        setContentView(R.layout.activity_groupchat);
 
         mAuth = FirebaseAuth.getInstance();
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        chatRecyclerView = findViewById(R.id.recycler_view_chat);
+        editText = findViewById(R.id.group_message_edit_text);
+        groupChatId = getIntent().getStringExtra("group_id");
+        chatRecyclerView = findViewById(R.id.group_recycler_view_chat);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         chatAdapter = new ChatAdapter(getApplicationContext(), chatList);
+        senderEmail = mAuth.getCurrentUser().getEmail();
+        chatAdapter.setEmailCurrentUser(mAuth.getCurrentUser().getEmail());
         chatRecyclerView.setAdapter(chatAdapter);
-        chatAdapter.setEmailCurrentUser(senderEmail);
         loadChat();
         listenToChanges();
-        if (chatRecyclerView.getAdapter().getItemCount() > 1)
-            chatRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v,
-                                           int left, int top, int right, int bottom,
-                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    if (bottom < oldBottom) {
-                        chatRecyclerView.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                chatRecyclerView.smoothScrollToPosition(
-                                        chatRecyclerView.getAdapter().getItemCount() - 1);
-                            }
-                        }, 100);
-                    }
-                }
-            });
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
     }
@@ -102,18 +76,10 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Chat chat = new Chat();
-                    String chatKey = null;
                     for (final DataSnapshot chatSnapshot : snapshot.getChildren()) {
-                        chatKey = chatSnapshot.getKey();
                         chat = chatSnapshot.getValue(Chat.class);
                     }
-                    if (mAuth.getCurrentUser().getUid().equals(chat.getReceiverUid())) {
-//                            Log.d(TAG, "onDataChange: match" + chatSnapshot.getValue(Chat.class).getSender() + chatSnapshot.getValue(Chat.class).getMessage());
-                        mDatabase.child("Chats").child(chatId).child(chatKey).child("seen").setValue(true);
-                    }
-                    if(chatList.get(chatList.size()-1).getTimeStamp()!=chat.getTimeStamp()) chatList.add(chat);
-                    else chatList.get(chatList.size()-1).setSeen(true);
-
+                    chatList.add(chat);
                     chatAdapter.notifyDataSetChanged();
                     if (chatList.size() > 1)
                         chatRecyclerView.smoothScrollToPosition(chatList.size() - 1);
@@ -126,25 +92,18 @@ public class ChatActivity extends AppCompatActivity {
             }
         };
 
-        mDatabase.child("Chats").orderByKey().equalTo(chatId).addValueEventListener(changeListener);
+        mDatabase.child("GroupChats").orderByKey().equalTo(groupChatId).addValueEventListener(changeListener);
     }
 
-    public void loadChat() {
+    private void loadChat() {
         chatListener = new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     for (final DataSnapshot chatSnapshot : snapshot.getChildren()) {
-                        if (mAuth.getCurrentUser().getUid().equals(chatSnapshot.getValue(Chat.class).getReceiverUid())) {
-//                            Log.d(TAG, "onDataChange: match" + chatSnapshot.getValue(Chat.class).getSender() + chatSnapshot.getValue(Chat.class).getMessage());
-                            mDatabase.child("Chats").child(chatId).child(chatSnapshot.getKey()).child("seen").setValue(true);
-                        }
                         Chat chat = chatSnapshot.getValue(Chat.class);
-//                        if(chatList.get(chatList.size()-1).getTimeStamp()!=chat.getTimeStamp())
-                            chatList.add(chat);
-//                        else chatList.get(chatList.size()-1).setSeen(true);
-
+                        chatList.add(chat);
                     }
                     chatList.remove(chatList.size() - 1);
                     chatAdapter.notifyDataSetChanged();
@@ -158,22 +117,17 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         };
-        mDatabase.child("Chats").orderByKey().equalTo(chatId).addListenerForSingleValueEvent(chatListener);
-
+        mDatabase.child("GroupChats").orderByKey().equalTo(groupChatId).addListenerForSingleValueEvent(chatListener);
     }
 
-    String messageKey;
-    String fileId;
-
+    String messageKey, fileId;
     public void sendMessage(View view) {
-        final DatabaseReference chatsReff = mDatabase.child("Chats");
+        final DatabaseReference chatsReff = mDatabase.child("GroupChats");
         final Chat senderChat = new Chat();
         senderChat.setMessage(String.valueOf(editText.getText()));
-        senderChat.setReceiverUid(receiverId);
         senderChat.setSenderUid(currentUser);
         senderChat.setTimeStamp(System.currentTimeMillis() / 1000);
         senderChat.setSender(senderEmail);
-        senderChat.setReceiver(receiverEmail);
         senderChat.setSeen(false);
         if (filePath == null) {
             messageKey = chatsReff.push().getKey();
@@ -184,8 +138,8 @@ public class ChatActivity extends AppCompatActivity {
 
         //push to firebase
 
-        chatsReff.child(chatId).child(messageKey).setValue(senderChat);
-        chatAdapter.notifyDataSetChanged();
+        chatsReff.child(groupChatId).child(messageKey).setValue(senderChat);
+
         editText.setText("");
     }
 
@@ -202,9 +156,9 @@ public class ChatActivity extends AppCompatActivity {
 
         if (requestCode == PICK_FILE && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
-            final DatabaseReference chatsReff = mDatabase.child("Chats");
+            final DatabaseReference chatsReff = mDatabase.child("GroupChats");
             filePath = data.getData();
-            fileId = chatId + messageKey;
+            fileId = groupChatId + messageKey;
 
             messageKey = chatsReff.push().getKey();
 
@@ -217,7 +171,7 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            Toast.makeText(ChatActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupchatActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
 
                         }
                     })
@@ -225,7 +179,7 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             progressDialog.dismiss();
-                            Toast.makeText(ChatActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupchatActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -242,8 +196,8 @@ public class ChatActivity extends AppCompatActivity {
 //    @Override
 //    protected void onPause() {
 //        super.onPause();
-//        mDatabase.child("Chats").orderByKey().equalTo(chatId).removeEventListener(changeListener);
-//        mDatabase.child("Chats").orderByKey().equalTo(chatId).removeEventListener(chatListener);
+//        mDatabase.child("GroupChats").orderByKey().equalTo(groupChatId).removeEventListener(changeListener);
+//        mDatabase.child("GroupChats").orderByKey().equalTo(groupChatId).removeEventListener(chatListener);
 //    }
 
 }

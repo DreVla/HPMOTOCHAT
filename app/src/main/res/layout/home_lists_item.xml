@@ -17,7 +17,7 @@
         android:padding="12dp">
 
         <TextView
-            android:id="@+id/all_users_username"
+            android:id="@+id/home_list_item_tile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"

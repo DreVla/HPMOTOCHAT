@@ -3,13 +3,12 @@ package com.hpmtutorial.hpmotochat.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,11 +20,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hpmtutorial.hpmotochat.R;
 import com.hpmtutorial.hpmotochat.model.User;
+import com.hpmtutorial.hpmotochat.view.adapters.UsersAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllUsersActivity extends AppCompatActivity {
+/**
+ * A placeholder fragment containing a simple view.
+ */
+public class PrivateFragment extends Fragment {
 
     private RecyclerView usersRecyclerView;
     private FirebaseAuth mAuth;
@@ -36,15 +39,20 @@ public class AllUsersActivity extends AppCompatActivity {
     private String receiverEmail;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_users);
+
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_private, container, false);
         mAuth = FirebaseAuth.getInstance();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        usersRecyclerView = findViewById(R.id.users_recycler_view);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new UsersAdapter(this, users, new UsersAdapter.ItemClickListener() {
+        usersRecyclerView = root.findViewById(R.id.users_recycler_view);
+        usersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new UsersAdapter(getContext(), users, new UsersAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 receiverEmail = adapter.getItem(position).getEmail();
@@ -56,7 +64,7 @@ public class AllUsersActivity extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
                                     String receiverUID = childSnapshot.getKey();
-                                    Intent chatIntent = new Intent(getApplicationContext(), ChatActivity.class);
+                                    Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                     chatIntent.putExtra("current_user_uid", mAuth.getCurrentUser().getUid());
                                     chatIntent.putExtra("receiver_user_uid", receiverUID);
                                     chatIntent.putExtra("sender", mAuth.getCurrentUser().getEmail());
@@ -92,30 +100,6 @@ public class AllUsersActivity extends AppCompatActivity {
             }
         };
         usersdRef.addListenerForSingleValueEvent(eventListener);
-
+        return root;
     }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.home_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.books_log_out:
-                logOut();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void logOut() {
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
 }
